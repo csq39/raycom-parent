@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.raycom.system.web.dao.SecurityDao">
+	
+	<!-- 根据登录名查询用户 -->
+	<select id="getByLoginName" resultType="io.raycom.common.bean.SystemUser" parameterType="String">
+		SELECT 	a.user_id  id,
+			  	a.office_id  AS "officeId",
+			  	a.org_id  AS "companyId",
+			  	a.login_name    loginName,
+			  	a.password,
+			    a.user_name name, 
+			  	a.email,
+			    a.phone_no phone,
+          		a.mobile_no mobile,
+			  	a.user_type     userType,
+			  	a.login_ip	loginIp,
+			  	a.login_date loginDate,
+			  	a.remarks,
+			  	a.login_flag    loginFlag
+			FROM com_user a
+			WHERE del_flag!='Y'
+			AND  upper(a.login_name) = upper(#{loginName})
+	</select>
+	
+	<!-- 根据主键ID查询用户 -->
+	<select id="getUser" resultType="io.raycom.common.bean.SystemUser" parameterType="String">
+		SELECT 	a.user_id  id,
+			  	a.office_id  AS "officeId",
+			  	a.org_id  AS "companyId",
+			  	a.login_name    loginName,
+			  	a.password,
+			    a.user_name name, 
+			  	a.email,
+			    a.phone_no phone,
+         		a.mobile_no mobile,
+			  	a.user_type     userType,
+			  	a.login_ip	loginIp,
+			  	a.login_date loginDate,
+			  	a.remarks,
+			  	a.login_flag    loginFlag
+			FROM com_user a
+			WHERE del_flag!='Y'
+			AND  a.user_id = #{id} 
+	</select>
+	
+	<!-- 根据角色名获取角色 -->
+	<select id="getRoleByName" resultType="io.raycom.common.bean.SystemRole" parameterType="String">
+	  	SELECT  a.role_id id,
+		        a.role_name name,
+		        a.role_enname enname,
+		        a.role_type AS roleType,
+		        a.is_sys AS sysData
+    	 FROM   com_role a
+		 WHERE a.role_name = #{name} AND a.del_flag !='Y'
+	</select>
+	
+	<!-- 根据角色ID获取角色 -->
+	<select id="getRole" resultType="io.raycom.common.bean.SystemRole" parameterType="String">
+		SELECT  a.role_id id,
+		        a.role_name name,
+		        a.role_enname enname,
+		        a.role_type AS roleType,
+		        a.is_sys AS sysData
+    	 FROM   com_role a
+		 WHERE a.role_id = #{id} AND a.del_flag !='Y'
+	</select>
+	
+	<!-- 根据用户ID获取角色列表 -->
+	<select id="getRoleListByUserId" resultType="io.raycom.common.bean.SystemRole" parameterType="String">
+	  SELECT  a.role_id id,
+	          a.role_name name,
+	          a.role_enname enname,
+	          a.role_type AS roleType,
+	          a.remarks,
+	          a.del_flag,
+	          a.is_sys    AS sysData
+	    FROM  com_role a,
+	          com_role_user ur
+	   WHERE  ur.role_id = a.role_id
+         AND  a.del_flag='N'
+	     AND  ur.user_id= #{userId}
+	</select>
+	
+	<!-- 获取角色列表 -->
+	<select id="getAllRoleList" resultType="io.raycom.common.bean.SystemRole" parameterType="String">
+	  SELECT  distinct a.role_id id,
+	          a.role_name name,
+	          a.role_enname enname,
+	          a.role_type AS roleType,
+	          a.remarks,
+	          a.del_flag,
+	          a.is_sys    AS sysData
+	    FROM  com_role a,
+	          com_role_user ur
+	   WHERE  ur.role_id = a.role_id
+         AND  a.del_flag='N'
+	</select>
+	
+	<!-- 根据菜单ID获取菜单 -->
+	<select id="getMenu" resultType="io.raycom.common.bean.SystemMenu" parameterType="String">
+		  SELECT  a.menu_id id,
+		          a.parent_id   AS "parentId",
+		          a.parent_ids parentIds,
+		          a.name,
+		          a.href,
+		          a.target,
+		          a.icon,
+		          a.sort,
+		          (select count(cm.menu_id) from  com_menu cm where cm.parent_id=a.menu_id) "hasChild",
+		          a.permission
+		     FROM com_menu a
+		   WHERE  del_flag='N'
+		     AND  is_show='Y'
+		     AND  a.menu_id = #{id} 
+	</select>
+	
+	<!-- 跟父级菜单列查询列表 -->
+	<select id="getByParentIdsLike" resultType="rdata" parameterType="rdata">
+		SELECT INSTR((SELECT parent_ids || ',' || menu_id  FROM com_menu WHERE menu_id = #{menuId}), menu_Id)  "sort",
+               name       "menuName",
+               href       "href",
+               menu_id    "menuId"
+          FROM com_menu
+         WHERE INSTR((SELECT parent_ids || ',' || menu_id FROM com_menu WHERE menu_id = #{menuId}), menu_Id) > 0
+           AND menu_id !='1000000'
+         ORDER BY 1
+	</select>
+	
+	<!-- 根据用户ID获取菜单列表 -->
+	<select id="getByUserId" resultType="io.raycom.common.bean.SystemMenu" parameterType="String">
+	  SELECT  distinct a.menu_id id,
+	          a.parent_id   AS "parentId",
+	          a.parent_ids parentIds,
+	          a.name,
+	          a.href,
+	          a.target,
+	          a.icon,
+	          a.sort,
+	          ( select count(cm.menu_id) from  com_menu cm where cm.parent_id=a.menu_id) "hasChild"
+	    FROM  com_menu a,
+          	  com_role_menu rm ,
+              com_role_user ur
+	    WHERE a.menu_id=rm.menu_id
+	      AND rm.role_id = ur.role_id
+	      AND ur.user_id = #{userId}
+	      AND a.del_flag='N'
+	      AND a.is_show='Y'
+	     AND  a.menu_id!='1000000'
+	    ORDER BY a.parent_id,sort
+	</select>
+	
+	<!-- 根据用户ID获取权限列表 -->
+	<select id="getPermissionByUserId" resultType="rdata" parameterType="String">
+	  SELECT  distinct  rm.permission_code "permissionCode",
+	  		  a.permission "permission"
+        FROM  com_menu a,
+         	  com_role_menu rm ,
+              com_role_user ur
+	    WHERE a.menu_id=rm.menu_id
+	      AND rm.role_id = ur.role_id
+	      AND ur.user_id = #{userId}
+	      AND a.del_flag='N'
+	      AND a.is_show='Y'
+	</select>
+	
+	<!-- 获取所有菜单 -->
+	<select id="getAllMenuList" resultType="io.raycom.common.bean.SystemMenu" >
+	  SELECT  distinct a.menu_id id,
+	          a.parent_id   AS "parentId",
+	          a.parent_ids parentIds,
+	          a.name,
+	          a.href,
+	          a.target,
+	          a.icon,
+	          a.sort,
+	          ( select count(cm.menu_id) from  com_menu cm where cm.parent_id=a.menu_id) "hasChild",
+	          a.permission
+	     FROM com_menu a
+	   WHERE  del_flag='N'
+	    AND a.is_show='Y'
+		ORDER BY a.sort
+	</select>
+	
+	<!-- 更新登录信息，如登录IP、登录时间 -->
+	<update id="updateLoginInfo">
+		UPDATE com_user SET 
+			login_ip = #{loginIp}, 
+			login_Date = #{loginDate} 
+		WHERE user_id = #{id}
+	</update>
+	
+</mapper>

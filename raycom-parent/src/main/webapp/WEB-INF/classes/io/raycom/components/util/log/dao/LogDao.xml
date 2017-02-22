@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.raycom.components.util.log.dao.LogDao">
+	
+	 <!-- 新增日志-->
+	 <insert id="insert">
+		INSERT INTO com_log(
+			log_id, 
+			log_type, 
+			title,
+			create_by, 
+			create_date, 
+			remote_addr, 
+			user_agent, 
+			request_uri, 
+			method, 
+			params, 
+			exception
+		) VALUES (
+			#{id}, 
+			#{type}, 
+			#{title}, 
+			#{createBy.id}, 
+			#{createDate,jdbcType=DATE}, 
+			#{remoteAddr}, 
+			#{userAgent}, 
+			#{requestUri}, 
+			#{method}, 
+			#{params,jdbcType=CLOB}, 
+			#{exception,jdbcType=CLOB}
+		)
+	</insert>
+
+	
+</mapper>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.raycom.system.web.dao.UtilDao">
+	
+	<!-- 根据登录名查询用户 -->
+	<select id="getByLoginName" resultType="io.raycom.common.bean.SystemUser" parameterType="String">
+	    SELECT a.user_id    id,
+	           a.office_id  AS "officeId",
+	           a.login_name loginName,
+	           a.password,
+	           a.user_name  name,
+	           a.email,
+	           a.phone_no   phone,
+	           a.mobile_no  mobile,
+	           a.user_type  userType,
+	           a.login_ip   loginIp,
+	           a.login_date loginDate,
+	           a.remarks,
+	           a.login_flag loginFlag
+	      FROM com_user a
+	     WHERE del_flag != 'Y'
+		  AND  a.login_name = #{loginName} 
+	</select>
+	
+	<!-- 根据主键ID查询用户 -->
+	<select id="getUser" resultType="io.raycom.common.bean.SystemUser" parameterType="String">
+		SELECT a.user_id    id,
+	           a.office_id  AS "officeId",
+	           a.login_name loginName,
+	           a.password,
+	           a.user_name  name,
+	           a.email,
+	           a.phone_no   phone,
+	           a.mobile_no  mobile,
+	           a.user_type  userType,
+	           a.login_ip   loginIp,
+	           a.login_date loginDate,
+	           a.remarks,
+	           a.login_flag loginFlag
+	      FROM com_user a
+	     WHERE del_flag != 'Y'
+		   AND a.user_id = #{id} 
+	</select>
+	
+	<!-- 根据用户ID获取角色列表 -->
+	<select id="getRoleListByUserId" resultType="io.raycom.common.bean.SystemRole" parameterType="String">
+	  SELECT  a.role_id id,
+	          a.role_name name,
+	          a.role_enname enname,
+	          a.role_type AS roleType,
+	          a.remarks,
+	          a.del_flag,
+	          a.is_sys    AS sysData
+	    FROM  com_role a,
+	          com_role_user ur
+	   WHERE  ur.role_id = a.role_id
+         AND  a.del_flag='N'
+	     AND  ur.user_id= #{userId}
+	</select>
+	
+	<!--根据部门ID获取部门名称 -->
+	<select id="getOfficeNameById" resultType="String"  parameterType="String">
+	   SELECT org_name FROM  tb_usc_org  WHERE org_id =  #{officeId} AND rownum=1
+	</select>
+	
+</mapper>
