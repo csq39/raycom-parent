@@ -1,5 +1,10 @@
 package io.raycom.common.utils.excel;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 
@@ -9,6 +14,14 @@ import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import io.raycom.system.framework.collection.RMultiData;
+import jxl.read.biff.BiffException;
 
 /**
  * 处理excel的相关函数
@@ -50,6 +63,43 @@ public class ExcelUtil {
 			}
 		}
 		return result;
+	}
+	
+	/**
+	 * 
+	 * @param file文件
+	 * @return RMultiData 从第二行开始，一次加入数据中，key值为序号，从0开始
+	 * @throws IOException 
+	 * @throws BiffException 
+	 */
+	public static RMultiData getExcelData(File file) throws IOException {
+		RMultiData excelData=new RMultiData();
+		if(!file.isFile()) return excelData;
+		String fileName = file.getName();
+		String fileType = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
+		
+		InputStream stream = new FileInputStream(file);
+		Workbook wb = null;
+		
+		if (fileType.equals("xls")) {
+			wb = new HSSFWorkbook(stream);
+		} else if (fileType.equals("xlsx")) {
+			wb = new XSSFWorkbook(stream);
+		} else {
+			System.out.println("您输入的excel格式不正确");
+		}
+		Sheet sheet1 = wb.getSheetAt(0);
+		for (Row row : sheet1) {
+			for (Cell cell : row) {
+				if(row.getRowNum()>0)
+					excelData.add(row.getRowNum(), cell.getStringCellValue());
+			}
+		}
+
+		
+		
+		return excelData;
+		
 	}
 
 	/**
