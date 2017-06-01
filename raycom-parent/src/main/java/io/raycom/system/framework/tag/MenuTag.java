@@ -1,15 +1,16 @@
 package io.raycom.system.framework.tag;
 
-import io.raycom.common.bean.SystemMenu;
-import io.raycom.common.config.Global;
-import io.raycom.common.utils.SpringContextHolder;
-import io.raycom.common.utils.user.UserUtils;
-import io.raycom.system.web.dao.SecurityDao;
-
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspTagException;
+
+import io.raycom.common.bean.SystemMenu;
+import io.raycom.common.config.Global;
+import io.raycom.common.utils.SpringContextHolder;
+import io.raycom.common.utils.user.UserUtils;
+import io.raycom.system.framework.collection.RData;
+import io.raycom.system.web.dao.SecurityDao;
 
 public class MenuTag extends CTag {
 	private static final long serialVersionUID = 1L;
@@ -28,13 +29,7 @@ public class MenuTag extends CTag {
 		try {
 			HttpServletRequest req = (HttpServletRequest) pageContext.getRequest();
 			ctxpath = req.getContextPath()+Global.getAdminPath();
-			SecurityDao securityDao = SpringContextHolder.getBean(SecurityDao.class);
-			List<SystemMenu>  menuList;
-			if(UserUtils.getUser().isAdmin())
-				menuList = securityDao.getAllMenuList();
-			else
-				menuList = securityDao.getByUserId(UserUtils.getUser().getId());
-
+			List<SystemMenu>  menuList =  getMenuList();
 			this.printTagString(getMenuList(menuList,SystemMenu.getRootId()).toString());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -57,6 +52,23 @@ public class MenuTag extends CTag {
 		}
 		return sb.toString();
 	}
+	
+	public List<SystemMenu> getMenuList() { 
+		List<SystemMenu>  menuList;
+		SecurityDao securityDao = SpringContextHolder.getBean(SecurityDao.class);
+		RData rd = new RData();
+		
+		rd.set("jdbcType", Global.getConfig("jdbc.type"));
+		if(UserUtils.getUser().isAdmin()){
+			menuList = securityDao.getAllMenuList(rd);
+		}
+		else{
+			rd.set("userId", UserUtils.getUser().getId());
+			menuList = securityDao.getMenuByUserId(rd);
+		}
+		return menuList;
+	}
+	
 	
 	public String getMenuUrl(String menuUrl) { 
 		if(menuUrl==null||"#".equals(menuUrl)){

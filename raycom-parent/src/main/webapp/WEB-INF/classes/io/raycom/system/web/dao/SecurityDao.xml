@@ -117,6 +117,7 @@
 	
 	<!-- 跟父级菜单列查询列表 -->
 	<select id="getByParentIdsLike" resultType="rdata" parameterType="rdata">
+		<if test=" jdbcType == 'oracle'  ">
 		SELECT INSTR((SELECT parent_ids || ',' || menu_id  FROM com_menu WHERE menu_id = #{menuId}), menu_Id)  "sort",
                name       "menuName",
                href       "href",
@@ -125,10 +126,21 @@
          WHERE INSTR((SELECT parent_ids || ',' || menu_id FROM com_menu WHERE menu_id = #{menuId}), menu_Id) > 0
            AND menu_id !='1000000'
          ORDER BY 1
+        </if>
+        <if test=" jdbcType == 'mysql'  ">
+        SELECT INSTR((SELECT CONCAT(parent_ids , ',' , menu_id)  FROM com_menu WHERE menu_id = #{menuId}), menu_Id)  "sort",
+               NAME       "menuName",
+               href       "href",
+               menu_id    "menuId"
+          FROM com_menu
+         WHERE INSTR((SELECT CONCAT(parent_ids , ',', menu_id) FROM com_menu WHERE menu_id = #{menuId}), menu_Id) > 0
+           AND menu_id !='1000000'
+         ORDER BY 1
+         </if>
 	</select>
 	
 	<!-- 根据用户ID获取菜单列表 -->
-	<select id="getByUserId" resultType="io.raycom.common.bean.SystemMenu" parameterType="String">
+	<select id="getMenuByUserId" resultType="io.raycom.common.bean.SystemMenu" parameterType="rdata">
 	  SELECT  distinct a.menu_id id,
 	          a.parent_id   AS "parentId",
 	          a.parent_ids parentIds,
@@ -146,8 +158,32 @@
 	      AND ur.user_id = #{userId}
 	      AND a.del_flag='N'
 	      AND a.is_show='Y'
-	     AND  a.menu_id!='1000000'
+	      AND a.menu_id!='1000000'
+        <if test=" menuClkId != '' and menuClkId != null ">
+           AND	INSTR(CONCAT(a.parent_ids, ',',  a.menu_Id),#{menuClkId})  > 0
+         </if>
 	    ORDER BY a.parent_id,sort
+	</select>
+	
+	<!-- 获取所有菜单 -->
+	<select id="getAllMenuList" resultType="io.raycom.common.bean.SystemMenu" parameterType="rdata">
+	  SELECT  distinct a.menu_id id,
+	          a.parent_id   AS "parentId",
+	          a.parent_ids parentIds,
+	          a.name,
+	          a.href,
+	          a.target,
+	          a.icon,
+	          a.sort,
+	          ( select count(cm.menu_id) from  com_menu cm where cm.parent_id=a.menu_id) "hasChild",
+	          a.permission
+	     FROM com_menu a
+	   WHERE  del_flag='N'
+	    AND a.is_show='Y'
+    <if test=" menuClkId != '' and menuClkId != null ">
+         AND	INSTR(CONCAT(a.parent_ids, ',',  a.menu_Id),#{menuClkId})  > 0
+        </if>
+		ORDER BY a.sort
 	</select>
 	
 	<!-- 根据用户ID获取权限列表 -->
@@ -162,24 +198,6 @@
 	      AND ur.user_id = #{userId}
 	      AND a.del_flag='N'
 	      AND a.is_show='Y'
-	</select>
-	
-	<!-- 获取所有菜单 -->
-	<select id="getAllMenuList" resultType="io.raycom.common.bean.SystemMenu" >
-	  SELECT  distinct a.menu_id id,
-	          a.parent_id   AS "parentId",
-	          a.parent_ids parentIds,
-	          a.name,
-	          a.href,
-	          a.target,
-	          a.icon,
-	          a.sort,
-	          ( select count(cm.menu_id) from  com_menu cm where cm.parent_id=a.menu_id) "hasChild",
-	          a.permission
-	     FROM com_menu a
-	   WHERE  del_flag='N'
-	    AND a.is_show='Y'
-		ORDER BY a.sort
 	</select>
 	
 	<!-- 更新登录信息，如登录IP、登录时间 -->

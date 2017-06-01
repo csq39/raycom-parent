@@ -11,7 +11,7 @@
 	<context:property-placeholder ignore-unresolvable="true" location="classpath:raycom.properties,classpath:raycom-scheduled.properties" />
 	
 	<!-- 使用Annotation自动注册Bean,只扫描@Controller -->
-	<context:component-scan base-package="io.raycom" use-default-filters="false"><!-- base-package 如果多个，用“,”分隔 -->
+	<context:component-scan base-package="io.raycom" use-default-filters="false" scope-resolver="io.raycom.system.framework.context.annotation.RaycomControllerScopeResolver"><!-- base-package 如果多个，用“,”分隔 -->
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
 	</context:component-scan>
 	
@@ -117,9 +117,11 @@
 	<!-- 支持Shiro对Controller的方法级AOP安全控制 end -->
 	
 	<!-- 上传文件拦截，设置最大上传文件大小   10M=10*1024*1024(B)=10485760 bytes -->  
-	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">  
-		<property name="maxUploadSize" value="${web.maxUploadSize}" />  
+	<!-- <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">   -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver">  
+		<!-- <property name="maxUploadSize" value="${web.maxUploadSize}" />  
 		<property name="resolveLazily" value="true"/>
+	    <property name="defaultEncoding" value="UTF-8"/>     -->
 	</bean>
 	
 </beans>

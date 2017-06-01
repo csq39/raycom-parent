@@ -3,6 +3,7 @@ package io.raycom.system.framework.tag;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import io.raycom.common.config.Constant;
+import io.raycom.common.config.Global;
 import io.raycom.common.utils.FreeMarkers;
 import io.raycom.common.utils.SpringContextHolder;
 import io.raycom.common.utils.string.StringUtils;
@@ -46,6 +47,7 @@ public class NavigationTag extends CTag {
 		StringBuilder sb = new StringBuilder();
 		RData rd = new RData();
 		rd.set("menuId", menuId);
+		rd.set("jdbcType", Global.getConfig("jdbc.type"));
 		SecurityDao securityDao = SpringContextHolder.getBean(SecurityDao.class);
 		List<RData> dataList = securityDao.getByParentIdsLike(rd);
 			try {

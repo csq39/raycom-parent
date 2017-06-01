@@ -36,6 +36,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.fasterxml.jackson.databind.JavaType;
 
 import io.raycom.common.bean.beanvalidator.BeanValidators;
+import io.raycom.common.config.Constant;
 import io.raycom.common.mapper.JsonMapper;
 import io.raycom.common.utils.date.DateUtils;
 import io.raycom.common.utils.user.UserUtils;
@@ -100,6 +101,10 @@ public abstract class BaseController {
 			processPageData(request.getRequestURI());
 		}
 		
+		if(rdata.containsKey("urlAction")){
+			processUrlActionData(request.getRequestURI());
+		}
+		
 		Map<String, String[]> parameterMap = request.getParameterMap();
 		mdata = new RMultiData();
 		for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
@@ -109,16 +114,34 @@ public abstract class BaseController {
 		}
 	}
 	
+	private void processUrlActionData(String uri){
+		UserUtils.putCache(Constant.CACHE_ACTION_URL+uri, rdata.getString("urlAction"));
+		UserUtils.putCache(Constant.CACHE_PRE_URL, uri);
+	}
+	
 	private void processPageData(String uri){
 		if(page.param!=null){
 			if(rdata.getBoolean("isDtRealQuest")){//采用页面传输数据，则将查询条件保存到缓存中
-				UserUtils.putCache(uri, rdata.clone());
+				UserUtils.putCache("isDtRealQuest"+uri, rdata.clone());
 			}else{
-				RData sessionRdata = (RData)UserUtils.getCache(uri);
+				RData sessionRdata = (RData)UserUtils.getCache("isDtRealQuest"+uri);
+				String preUrl = (String)UserUtils.getCache(Constant.CACHE_PRE_URL);
+				String preUrlAction = (String)UserUtils.getCache(Constant.CACHE_ACTION_URL+preUrl);
 				if(sessionRdata!=null){
-					sessionRdata.remove("draw");
-					sessionRdata.remove("start");
-					sessionRdata.remove("length");
+					if("cancel".equals(preUrlAction)){
+						UserUtils.removeCache(Constant.CACHE_PRE_URL);
+						if(sessionRdata.containsKey("start"))
+							page.setStart(sessionRdata.getInt("start"));
+						if(sessionRdata.containsKey("draw"))
+							page.setDraw(sessionRdata.getInt("draw"));
+						if(sessionRdata.containsKey("length"))
+							page.setLength(sessionRdata.getInt("length"));
+					}else{
+						sessionRdata.remove("start");
+						sessionRdata.remove("draw");
+						sessionRdata.remove("length");
+					}
+					
 					page.sessionRdata = sessionRdata.clone();
 					page.param = sessionRdata;
 					rdata= sessionRdata;

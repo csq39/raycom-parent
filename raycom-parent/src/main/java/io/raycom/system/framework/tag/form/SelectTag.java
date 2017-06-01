@@ -1,7 +1,15 @@
 package io.raycom.system.framework.tag.form;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.jsp.JspTagException;
+
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import io.raycom.common.bean.SystemRole;
 import io.raycom.common.bean.SystemUser;
 import io.raycom.common.utils.FreeMarkers;
 import io.raycom.common.utils.SpringContextHolder;
@@ -11,13 +19,6 @@ import io.raycom.system.framework.collection.RData;
 import io.raycom.system.framework.collection.RMultiData;
 import io.raycom.system.framework.tag.CTag;
 import io.raycom.system.web.dao.DictDao;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.jsp.JspTagException;
 
 /**
  * 下拉框，数据来源有两种，一个是页面传入，一个后台server读取，其中后台server读取需要传入comcode，其值：
@@ -59,6 +60,7 @@ public class SelectTag extends CTag {
 	private final static String  WHROLEL="role-wh" ;
 	private final static String  UNITS="unit" ;
 	private final static String  MANUFACTURE="manufacture" ;
+	private final static String  COMPANY="company" ;
 	private final static String  NATION="nation" ;
 
 	public SelectTag() {
@@ -208,7 +210,15 @@ public class SelectTag extends CTag {
 				DictDao dictDao = SpringContextHolder.getBean(DictDao.class);
 				RData rdata = new RData();
 				SystemUser user = UserUtils.getUser();
-				if (!user.isAdmin(user.getId()))
+				boolean isAdmin = user.isAdmin();
+				List<SystemRole> roleList= user.getRoleList();
+				for (SystemRole systemRole : roleList) {
+					if("Y".equals(systemRole.getSysData())){
+						isAdmin = true;
+						break;
+					}
+				}
+				if (!isAdmin)
 					rdata.set("userId", user.getId());
 					items = dictDao.findWHList(rdata);
 				itemLabel="name" ;
@@ -228,6 +238,11 @@ public class SelectTag extends CTag {
 			}else if(MANUFACTURE.equals(comCode)){//厂家
 				DictDao dictDao = SpringContextHolder.getBean(DictDao.class);
 				items = dictDao.findManufactureList();
+				itemLabel="name" ;
+				itemValue="code";
+			}else if(COMPANY.equals(comCode)){//厂家
+				DictDao dictDao = SpringContextHolder.getBean(DictDao.class);
+				items = dictDao.findCompanyList();
 				itemLabel="name" ;
 				itemValue="code";
 			}else if(NATION.equals(comCode)){//国家

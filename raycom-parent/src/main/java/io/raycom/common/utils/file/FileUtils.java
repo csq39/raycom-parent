@@ -446,12 +446,6 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	public static String path(String path){
 		String p = StringUtils.replace(path, "\\", File.separator);
 		p = StringUtils.join(StringUtils.split(p, File.separator), File.separator);
-		if (!StringUtils.startsWithAny(p, File.separator) && StringUtils.startsWithAny(path, "\\", File.separator)){
-			p +=File.separator;
-		}
-		if (!StringUtils.endsWithAny(p, File.separator) && StringUtils.endsWithAny(path, "\\",File.separator)){
-			p = p + File.separator;
-		}
 		return p;
 	}
 	

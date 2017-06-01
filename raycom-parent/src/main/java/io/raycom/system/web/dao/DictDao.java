@@ -26,6 +26,8 @@ public interface DictDao extends CrudDao {
 	
 	public List<RData> findManufactureList();
 	
+	public List<RData> findCompanyList();
+	
 	public List<RData> findNationList();
 	
 	

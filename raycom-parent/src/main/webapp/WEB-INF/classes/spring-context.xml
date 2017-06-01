@@ -20,8 +20,8 @@
     <util:properties id="APP_PROP" location="classpath:raycom.properties" local-override="true"/>
 	
 	<!-- 使用Annotation自动注册Bean，解决事物失效问题：在主容器中不扫描@Controller注解，在SpringMvc中只扫描@Controller注解。  -->
-	<context:component-scan base-package="io.raycom"><!-- base-package 如果多个，用“,”分隔 -->
-		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	<context:component-scan base-package="io.raycom" ><!-- base-package 如果多个，用“,”分隔 -->
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
 	</context:component-scan>
 	
  	<!-- MyBatis begin -->

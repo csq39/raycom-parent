@@ -1,20 +1,5 @@
 package io.raycom.system.web.login;
 
-import io.raycom.common.bean.Principal;
-import io.raycom.common.config.Constant;
-import io.raycom.common.config.Global;
-import io.raycom.common.servlet.ValidateCodeServlet;
-import io.raycom.common.utils.IdGen;
-import io.raycom.common.utils.cache.CacheUtils;
-import io.raycom.common.utils.lang.CookieUtils;
-import io.raycom.common.utils.string.StringUtils;
-import io.raycom.common.utils.user.UserUtils;
-import io.raycom.common.web.BaseController;
-import io.raycom.system.security.LoginValidater;
-import io.raycom.system.security.shiro.authc.FormAuthenticationFilter;
-import io.raycom.system.security.shiro.session.SessionDAO;
-
-import java.util.ArrayList;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +16,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.common.collect.Maps;
+
+import io.raycom.common.bean.Principal;
+import io.raycom.common.config.Constant;
+import io.raycom.common.config.Global;
+import io.raycom.common.servlet.ValidateCodeServlet;
+import io.raycom.common.utils.IdGen;
+import io.raycom.common.utils.cache.CacheUtils;
+import io.raycom.common.utils.lang.CookieUtils;
+import io.raycom.common.utils.string.StringUtils;
+import io.raycom.common.utils.user.UserUtils;
+import io.raycom.common.web.BaseController;
+import io.raycom.system.security.LoginValidater;
+import io.raycom.system.security.shiro.authc.FormAuthenticationFilter;
+import io.raycom.system.security.shiro.session.SessionDAO;
 
 /**
  * 
@@ -219,4 +218,5 @@ public class LoginController extends BaseController{
 			UserUtils.putCache(Constant.CACHE_MENU_CLICK, rdata.getString("menuClickId"));
 		return "";
 	}
+	
 }

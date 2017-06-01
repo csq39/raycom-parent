@@ -22,6 +22,14 @@
 		 WHERE del_flag = 'N'
 	</select>
 	
+	<!-- 下拉列表用-公司编码 -->
+	<select id="findCompanyList" resultType="rdata">
+		SELECT company_id "code",
+			   company_name "name"
+		  FROM t_company  
+		 WHERE del_flag = 'N'
+	</select>
+	
 	<!-- 下拉列表用 -生产厂家-->
 	<select id="findManufactureList" resultType="rdata">
 	    SELECT manufacture_id "code",
@@ -54,6 +62,7 @@
 		       SUBSTR(tuw.wh_parent_ids, 3, 6) "topPid",
 		       tuw.wh_parent_id "pid",
 		       (select wh_name from tb_usc_warehouse where wh_id = tuw.wh_parent_id) "pName",
+		        decode((select wh_name from tb_usc_warehouse where wh_id = tuw.wh_parent_id),'大库','0','科室库','1',wh_parent_id) "index",
 		       (select wh_name
 		          from tb_usc_warehouse
 		         where wh_id = SUBSTR(tuw.wh_parent_ids, 3, 6)) "topPName"
@@ -64,6 +73,7 @@
 		  <if test="userId != null and userId != ''">
 		   AND wh_id in (SELECT wh_id FROM tb_usc_warehouse_user WHERE user_id = #{userId})
 		 </if>
+		  ORDER BY 8,7
 	</select>
 	<!-- 查询仓库列表 -->
 	<select id="findOfficeList" resultType="rdata" parameterType="rdata">

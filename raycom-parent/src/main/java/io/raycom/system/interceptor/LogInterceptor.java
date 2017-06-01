@@ -51,7 +51,7 @@ public class LogInterceptor extends BaseService implements HandlerInterceptor {
 			Object handler, Exception ex) throws Exception {
 
 		// 保存日志
-		LogUtils.saveLog(request, handler, ex, null);
+		//LogUtils.saveLog(request, handler, ex, null);
 		
 		// 打印JVM信息。
 		if (logger.isDebugEnabled()){

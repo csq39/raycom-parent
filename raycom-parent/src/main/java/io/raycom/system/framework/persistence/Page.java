@@ -17,9 +17,9 @@ import java.util.List;
  */
 public class Page<T> {
 	
-	private int draw = 1; // 当前页码
+	private int draw = 0; // 当前页码
 	
-	private int start = 0; // 其实条数
+	private int start = 0; // 起始条数
 
 	private int length = -1;//  页面大小，设置为“-1”表示不进行分页（分页无效）
 	
@@ -94,7 +94,7 @@ public class Page<T> {
 	}
 
 	public int getStart() {
-		return start;
+		return start ;
 	}
 
 	public void setStart(int start) {

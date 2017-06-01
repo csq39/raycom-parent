@@ -34,12 +34,12 @@ public interface SecurityDao extends BaseDao {
 	public List<SystemRole> getAllRoleList();
 	
 	public List<RData> getByParentIdsLike(RData menuId);
-
-	public List<SystemMenu> getByUserId(String userId);
 	
 	public List<RData> getPermissionByUserId(String userId);
 	
-	public List<SystemMenu> getAllMenuList();
+	public List<SystemMenu> getAllMenuList(RData menuId);
+	
+	public List<SystemMenu> getMenuByUserId(RData menuId);
 	
 	/**
 	 * 更新登录信息，如：登录IP、登录时间

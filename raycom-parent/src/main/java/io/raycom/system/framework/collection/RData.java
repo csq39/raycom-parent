@@ -132,9 +132,14 @@ public class RData extends RDataProtocol {
 					throw new RuntimeException(
 							"[RuntimeException in RData] Value Type(int) does not match : It's type is not int.");
 				}
+			}else{
+				try {
+					return Integer.parseInt(String.valueOf(o));
+				} catch (NumberFormatException e) {
+					throw new RuntimeException(
+							"[RuntimeException in RData] Value Type(int) does not match : It's type is not int.");
+				} 
 			}
-			throw new RuntimeException(
-					"[RuntimeException in RData] Value Type(int) does not match : It's type is not int.");
 		}
 	}
 

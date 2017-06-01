@@ -24,6 +24,8 @@ public class AttachmentUtils {
 	
 	private static String defaultValue = "";
 	
+	private static String staticAttachentUrl = "";
+	
 	
 	public static String getFileOrigname(String fileId){
 		RData rdata = new RData();
@@ -57,6 +59,19 @@ public class AttachmentUtils {
 		if(rdata!=null)
 			imgPath = rdata.getString("filePath");
 		return imgPath;
+	}
+	
+	public static String getImgUrlById(String fileId){
+		return staticAttachentUrl+getImgById(fileId);
+	}
+	
+	public  String getStaticAttachentUrl() {
+		return staticAttachentUrl;
+	}
+	
+	@Value("${staticAttachentUrl}")
+	public  void setStaticAttachentUrl(String staticAttachentUrl) {
+		AttachmentUtils.staticAttachentUrl = staticAttachentUrl;
 	}
 	
 }

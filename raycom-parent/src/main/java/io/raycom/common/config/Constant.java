@@ -31,6 +31,8 @@ public class Constant {
 	public static final String CACHE_AREA_LIST = "areaList";
 	
 	public static final String CACHE_MENU_CLICK = "menuId_click";
+	public static final String CACHE_ACTION_URL = "url_click";
+	public static final String CACHE_PRE_URL = "url_click";
 	
 	public static final String MQ_MODEL_DEV = "dev";
 	public static final String Y_VALUE = "Y";

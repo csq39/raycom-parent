@@ -3,12 +3,10 @@ package io.raycom.system.web.file;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,35 +18,28 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartFile;
 
 import io.raycom.common.config.Constant;
 import io.raycom.common.utils.IdGen;
 import io.raycom.common.utils.date.DateUtils;
-import io.raycom.common.utils.excel.ExcelExportor;
-import io.raycom.common.utils.excel.ExportForExcel;
 import io.raycom.common.utils.file.FileUtils;
-import io.raycom.common.utils.string.StringUtils;
 import io.raycom.common.web.BaseController;
 import io.raycom.components.context.event.listener.RaycomEventPublisher;
 import io.raycom.components.context.event.sysEvent.FileUploadEvent;
 import io.raycom.system.framework.collection.RData;
-import io.raycom.system.web.dao.FileDao;
 @Controller
 public class FileController extends BaseController{
-	
-	@Autowired
-	private FileDao fileDao;
-	
-	@Value("${uploadPath}")
-	protected String fileUploadDir;
-	
 	@Value("${fileUploadEventDefaultFired}")
 	protected String fileUploadEventDefaultFired;
+	@Autowired
+	public FileService fileService;
 	
 	// 最大文件大小
 	@Value("${web.maxUploadSize}")
@@ -59,11 +50,13 @@ public class FileController extends BaseController{
 	
     @RequestMapping(value = "${adminPath}/file/upload",method = RequestMethod.POST)  
     @ResponseBody
-    public  RData upload(@RequestParam CommonsMultipartFile file) {  
+   //public  RData upload(@RequestParam CommonsMultipartFile file) {  
+	public  RData upload(
+			 MultipartFile file ) {  
     		
 		String originalFilename = file.getOriginalFilename();
 	    String fileExt = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
-	    String fileName = UUID.randomUUID().toString()+"."+fileExt;
+	    String fileName = IdGen.uuid()+"."+fileExt;
 
 	    if (file.getSize() > maxSize) { // 检查文件大小
 			fileExt = "上传文件大小超过限制";
@@ -76,19 +69,18 @@ public class FileController extends BaseController{
 			return rdata;
 		} 
 	    
-	    File f = getFile(fileName);
+	    File f = fileService.getFile(fileName);
 	    
 	    rdata.set("OriginalFilename", originalFilename);
 	    rdata.set("fileName", fileName);
 	    rdata.set("fileSize", file.getSize());
-	    rdata.set("fileUploadDir", FileUtils.path(fileUploadDir));
 	    rdata.set("fileUploadPath", "/"+DateUtils.getDate()+"/"+fileName);
 	    rdata.set("fileId", IdGen.uuid());//生成主键，16位
 	    rdata.set("error","");
 		
         try {  
             FileUtils.copyInputStreamToFile(file.getInputStream(),f );  
-            fileDao.addFile(rdata);
+            fileService.addFile(rdata);
             if(Constant.Y_VALUE.equals(fileUploadEventDefaultFired)||
             		Constant.Y_VALUE.equals(rdata.get("eventFired")))
             	RaycomEventPublisher.publishEvent(new FileUploadEvent(rdata));
@@ -101,14 +93,7 @@ public class FileController extends BaseController{
     
     @RequestMapping("${adminPath}/file/showImg")
     public String showImg(HttpServletRequest request, HttpServletResponse response) {
-    	if(rdata.containsKey("fileId")&&!StringUtils.isEmpty(rdata.getString("fileId")))
-    		rdata = fileDao.getFile(rdata);
-    	else{//默认图片
-    		rdata.set("fileNameOrig", "imgDefault.jpg");
-    		rdata.set("fileDir", request.getSession().getServletContext().getRealPath("/"));
-    		rdata.set("filePath", "/static/img/default/imgDefault.jpg");
-    		
-    	}
+    	rdata =fileService.getFileData(request,rdata);
     	
         response.setCharacterEncoding("utf-8");
         response.setContentType("multipart/form-data");
@@ -127,6 +112,7 @@ public class FileController extends BaseController{
             os.close();
             inputStream.close();
         } catch (FileNotFoundException e) {
+        	System.out.println(rdata.getString("fileDir")+rdata.getString("filePath"));
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
@@ -135,12 +121,27 @@ public class FileController extends BaseController{
             //java+getOutputStream() has already been called for this response
         return null;
     }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class) 
+    @ResponseBody
+    public RData handleException(MaxUploadSizeExceededException ex) throws Exception {   
+    	StringBuffer sb = new StringBuffer();
+        if (ex instanceof org.springframework.web.multipart.MaxUploadSizeExceededException){
+            sb.append("文件大小不应大于"+((MaxUploadSizeExceededException)ex).getMaxUploadSize()/(1024*1024)+"MB");
+         } else{
+             sb.append("上传异常！");
+        }
+        System.out.println(sb.toString());
+        RData rdata1 = new RData();
+        rdata1.set("error",sb.toString());
+        return rdata1;
+    }
     
     @RequestMapping("${adminPath}/file/download")
     public ResponseEntity<byte[]> download() throws IOException {  
-    	rdata = fileDao.getFile(rdata);
-    	String path = FileUtils.path(fileUploadDir)+rdata.getString("filePath");
-    	String fileName=new String(rdata.getString("fileNameOrig").getBytes("UTF-8"),"iso-8859-1");
+    	rdata = fileService.getFileDataByDB(rdata);
+    	String path = rdata.getString("path");
+    	String fileName=new String(rdata.getString("fileName").getBytes("UTF-8"),"iso-8859-1");
         HttpHeaders headers = new HttpHeaders();  
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);  
         headers.setContentDispositionFormData("attachment",fileName);  
@@ -148,33 +149,5 @@ public class FileController extends BaseController{
                                           headers, HttpStatus.OK);  
     } 
     
-    public  RData buildExceltoFile( ExcelExportor exportor) throws IOException {
-
-    	RData fileData = new RData();
-		String target_file = UUID.randomUUID().toString()+".xls";
-		File file=getFile(target_file);   
-        OutputStream os=new FileOutputStream(file);  
-        ExportForExcel.buildExceltoFile(os, exportor);
-        fileData.set("OriginalFilename", target_file);
-        fileData.set("fileName", target_file);
-        fileData.set("fileSize", file.length());
-        fileData.set("fileUploadDir", FileUtils.path(fileUploadDir));
-        fileData.set("fileUploadPath", "/"+DateUtils.getDate()+"/"+target_file);
-        fileData.set("error","");
-        fileData.set("fileId", IdGen.uuid());//生成主键，16位
-        fileDao.addFile(fileData);
-        
-        return fileData;
-   	  
-    }
     
-    public  File getFile( String fileName) {
-    	
-    	String fileUploadPath="/"+DateUtils.getDate()+"/"+fileName;
- 	    fileUploadDir=FileUtils.path(fileUploadDir);
- 	    FileUtils.createDirectory(fileUploadDir+"/"+DateUtils.getDate());//创建上传文件夹
-        File f=new File(fileUploadDir+fileUploadPath);  
-        return f;
-   	  
-    }
 }

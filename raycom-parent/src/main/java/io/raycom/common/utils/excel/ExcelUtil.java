@@ -92,13 +92,32 @@ public class ExcelUtil {
 		for (Row row : sheet1) {
 			for (Cell cell : row) {
 				if(row.getRowNum()>0)
-					excelData.add(row.getRowNum(), cell.getStringCellValue());
+					excelData.add(cell.getColumnIndex()+"", getCellData(cell));
 			}
 		}
-
-		
-		
 		return excelData;
+		
+	}
+	public static Object getCellData(Cell cell) {
+		if(cell.getCellType()==Cell.CELL_TYPE_BLANK){
+			return cell.getStringCellValue();
+		}
+		if(cell.getCellType()==Cell.CELL_TYPE_BOOLEAN){
+			return cell.getBooleanCellValue();
+		}
+		if(cell.getCellType()==Cell.CELL_TYPE_ERROR){
+			return cell.getErrorCellValue();
+		}
+		if(cell.getCellType()==Cell.CELL_TYPE_FORMULA){
+			return cell.getCellFormula();
+		}
+		if(cell.getCellType()==Cell.CELL_TYPE_STRING){
+			return cell.getStringCellValue();
+		}
+		if(cell.getCellType()==Cell.CELL_TYPE_NUMERIC){
+			return cell.getNumericCellValue();
+		}
+		return "";
 		
 	}
 

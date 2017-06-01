@@ -20,7 +20,7 @@
 				trim(#{OriginalFilename}),
 				trim(#{fileUploadDir}),
 				#{currentUser},
-				sysdate)
+				#{createDate,jdbcType=DATE} )
 	</insert> 
 	
 	<!--根据fileID获取附件信息 -->
