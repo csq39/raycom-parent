@@ -42,6 +42,8 @@ public class SystemUser implements Serializable  {
 	
 	private boolean isAdmin=false;	// 是否是管理员
 	
+	private boolean isSysData=false;	// 是否是管理员
+	
 	private List<SystemRole> roleList = Lists.newArrayList(); // 拥有角色列表
 	private List<RData> whList = Lists.newArrayList(); // 拥有角色列表
 	private List<RData> roleOfficeList = Lists.newArrayList(); // 拥有角色列表
@@ -84,7 +86,14 @@ public class SystemUser implements Serializable  {
 		this.loginName = loginName;
 	}
 	
-	
+	public boolean isSysData() {
+		return isSysData||"10000001".equals(id);
+	}
+
+	public void setSysData(boolean isSysData) {
+		this.isSysData = isSysData;
+	}
+
 
 	public String getPhoto() {
 		return photo;

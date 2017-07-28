@@ -2,19 +2,22 @@ package io.raycom.system.framework.tag.form;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.jsp.JspTagException;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import io.raycom.common.bean.SystemRole;
 import io.raycom.common.bean.SystemUser;
 import io.raycom.common.utils.FreeMarkers;
 import io.raycom.common.utils.SpringContextHolder;
 import io.raycom.common.utils.string.StringUtils;
 import io.raycom.common.utils.user.UserUtils;
+import io.raycom.components.context.event.listener.IRayComEventListener;
 import io.raycom.system.framework.collection.RData;
 import io.raycom.system.framework.collection.RMultiData;
 import io.raycom.system.framework.tag.CTag;
@@ -210,17 +213,9 @@ public class SelectTag extends CTag {
 				DictDao dictDao = SpringContextHolder.getBean(DictDao.class);
 				RData rdata = new RData();
 				SystemUser user = UserUtils.getUser();
-				boolean isAdmin = user.isAdmin();
-				List<SystemRole> roleList= user.getRoleList();
-				for (SystemRole systemRole : roleList) {
-					if("Y".equals(systemRole.getSysData())){
-						isAdmin = true;
-						break;
-					}
-				}
-				if (!isAdmin)
+				if (!user.isSysData())
 					rdata.set("userId", user.getId());
-					items = dictDao.findWHList(rdata);
+				items = dictDao.findWHList(rdata);
 				itemLabel="name" ;
 				itemValue="code";
 				
@@ -253,6 +248,17 @@ public class SelectTag extends CTag {
 				if(StringUtils.isEmpty(value))
 					value="cn";
 			}else {
+				Map<String,SelectTagExtender> beans =  SpringContextHolder.getBeansOfType(SelectTagExtender.class);  
+				Collection<SelectTagExtender> selectTagExtenders = beans.values();  
+		        for (SelectTagExtender selectTagExtender : selectTagExtenders) {  
+		           if(selectTagExtender.getComCode().equals(comCode)){
+		        	   items = selectTagExtender.getItems();
+		        	   itemLabel=selectTagExtender.getItemLabel();
+		        	   itemValue=selectTagExtender.getItemValue();
+		        	   return;
+		           }
+	            }    
+		        
 				DictDao dictDao = SpringContextHolder.getBean(DictDao.class);
 				RData query = new RData();
 				query.set("type", comCode);

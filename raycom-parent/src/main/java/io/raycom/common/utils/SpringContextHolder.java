@@ -3,6 +3,8 @@
  */
 package io.raycom.common.utils;
 
+import java.util.Map;
+
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +51,10 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
 	public static <T> T getBean(Class<T> requiredType) {
 		assertContextInjected();
 		return applicationContext.getBean(requiredType);
+	}
+	public static <T> Map<String, T>  getBeansOfType(Class<T> requiredType) {
+		assertContextInjected();
+		return applicationContext.getBeansOfType(requiredType);
 	}
 
 	/**

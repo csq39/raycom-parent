@@ -78,7 +78,7 @@
 	<!-- 查询仓库列表 -->
 	<select id="findOfficeList" resultType="rdata" parameterType="rdata">
 		 SELECT  tuw.office_id "officeId",
-        		 ( select org_name from tb_usc_org where  org_id= tuw.office_id) officeName
+        		 ( select org_name from tb_usc_org where  org_id= tuw.office_id) "officeName"
            FROM  tb_usc_warehouse tuw
           WHERE  tuw.use_flag = 'Y'
             AND  tuw.del_flag = 'N'

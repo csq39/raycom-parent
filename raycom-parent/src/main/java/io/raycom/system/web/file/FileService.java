@@ -11,7 +11,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import io.raycom.common.utils.IdGen;
 import io.raycom.common.utils.date.DateUtils;
@@ -82,6 +87,15 @@ public class FileService{
  	    FileUtils.createDirectory(fileUploadDir+"/"+DateUtils.getDate());//创建上传文件夹
         File f=new File(fileUploadDir+fileUploadPath);  
         return f;
-   	  
     }
+    
+    public ResponseEntity<byte[]> downLoadZipFile(RData rdata) throws IOException{
+    	String fileName=new String(rdata.getString("fileName").getBytes("UTF-8"),"iso-8859-1");
+        HttpHeaders headers = new HttpHeaders();  
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);  
+        headers.setContentDispositionFormData("attachment",fileName);  
+        return new ResponseEntity<byte[]>(FileUtils.zipFilesToByteArray(rdata),  
+                                          headers, HttpStatus.OK);  
+    }
+    
 }

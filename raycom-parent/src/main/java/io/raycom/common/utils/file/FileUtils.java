@@ -3,8 +3,9 @@
  */
 package io.raycom.common.utils.file;
 
-import io.raycom.common.utils.string.StringUtils;
 
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,10 +14,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.tools.zip.ZipEntry;
+import org.apache.tools.zip.ZipOutputStream;
 import org.aspectj.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.raycom.common.utils.string.StringUtils;
+import io.raycom.system.framework.collection.RData;
 
 /**
  * 文件操作工具类
@@ -437,6 +445,200 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 
 		return filePath.substring(index + dirPaths.length());
 	}
+	
+	/**
+	 * 
+	 * @param rdata
+	 * 			fileName:对应zip文件名
+	 *         	fileList：list-->rdata对应附件地址
+	 *                            dirPath：对应附件在zip内的路径
+	 *                            file： 文件全路径，如果是目录，以"/"结尾
+	 * @return
+	 * @throws IOException 
+	 */
+	public static byte[] zipFilesToByteArray(RData rdata) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ZipOutputStream zipOut = new ZipOutputStream(baos);
+		zipOut.setEncoding(System.getProperty("sun.jnu.encoding"));
+		List<RData> fileList  = (List<RData>)rdata.get("fileList");
+		for (RData file : fileList) {
+			String fileDir = file.getString("file");
+			if(fileDir.endsWith("/"))
+				zipDirectoryToZipFileByTag(file.getString("dirPath"),zipOut);
+			else
+				zipFilesToZipFileByTag(file.getString("dirPath"),new File(fileDir),zipOut);
+		}
+		try {
+			zipOut.finish();
+			return baos.toByteArray(); 
+		}finally {
+			IOUtils.closeQuietly(zipOut);
+			IOUtils.closeQuietly(baos);
+		}
+        
+		
+	}
+	
+	/**
+	 * 将目录压缩到ZIP输出流
+	 * @param dirPath 目录路径
+	 * @param fileDir 文件信息
+	 * @param zouts 输出流
+	 */
+	public static void zipDirectoryToZipFileByTag(String dirPath, ZipOutputStream zouts) {
+		ZipEntry entry = new ZipEntry(dirPath);
+		try {
+			zouts.putNextEntry(entry);
+			zouts.closeEntry();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return;
+	}
+
+	/**
+	 * 将文件压缩到ZIP输出流
+	 * @param dirPath 目录路径
+	 * @param file 文件
+	 * @param zouts 输出流
+	 */
+	public static void zipFilesToZipFileByTag(String dirPath, File file, ZipOutputStream zouts) {
+		FileInputStream fin = null;
+		ZipEntry entry = null;
+		// 创建复制缓冲区
+		byte[] buf = new byte[4096];
+		int readByte = 0;
+		if (file.isFile()) {
+			try {
+				// 创建一个文件输入流
+				fin = new FileInputStream(file);
+				// 创建一个ZipEntry
+				entry = new ZipEntry(dirPath);
+				System.out.println("添加文件 " + dirPath);
+				// 存储信息到压缩文件
+				zouts.putNextEntry(entry);
+				// 复制字节到压缩文件
+				while ((readByte = fin.read(buf)) != -1) {
+					System.out.println("添加文件 " + readByte);
+					zouts.write(buf, 0, readByte);
+				}
+				zouts.closeEntry();
+				fin.close();
+				System.out
+						.println("添加文件 " + file.getAbsolutePath() + " 到zip文件中!");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	
+	
+	
+	public static void zipFiles(String srcDirName, String fileName,
+			String descFileName) {
+		// 判断目录是否存在
+		if (srcDirName == null) {
+			return;
+		}
+		File fileDir = new File(srcDirName);
+		if (!fileDir.exists() || !fileDir.isDirectory()) {
+			return;
+		}
+		String dirPath = fileDir.getAbsolutePath();
+		File descFile = new File(descFileName);
+		try {
+			ZipOutputStream zouts = new ZipOutputStream(new FileOutputStream(
+					descFile));
+			if ("*".equals(fileName) || "".equals(fileName)) {
+				FileUtils.zipDirectoryToZipFile(dirPath, fileDir, zouts);
+			} else {
+				File file = new File(fileDir, fileName);
+				if (file.isFile()) {
+					FileUtils.zipFilesToZipFile(dirPath, file, zouts);
+				} else {
+					FileUtils
+							.zipDirectoryToZipFile(dirPath, file, zouts);
+				}
+			}
+			zouts.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	/**
+	 * 将目录压缩到ZIP输出流
+	 * @param dirPath 目录路径
+	 * @param fileDir 文件信息
+	 * @param zouts 输出流
+	 */
+	public static void zipDirectoryToZipFile(String dirPath, File fileDir, ZipOutputStream zouts) {
+		if (fileDir.isDirectory()) {
+			File[] files = fileDir.listFiles();
+			// 空的文件夹
+			if (files.length == 0) {
+				// 目录信息
+				ZipEntry entry = new ZipEntry(getEntryName(dirPath, fileDir));
+				try {
+					zouts.putNextEntry(entry);
+					zouts.closeEntry();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return;
+			}
+
+			for (int i = 0; i < files.length; i++) {
+				if (files[i].isFile()) {
+					// 如果是文件，则调用文件压缩方法
+					FileUtils
+							.zipFilesToZipFile(dirPath, files[i], zouts);
+				} else {
+					// 如果是目录，则递归调用
+					FileUtils.zipDirectoryToZipFile(dirPath, files[i],
+							zouts);
+				}
+			}
+		}
+	}
+
+	/**
+	 * 将文件压缩到ZIP输出流
+	 * @param dirPath 目录路径
+	 * @param file 文件
+	 * @param zouts 输出流
+	 */
+	public static void zipFilesToZipFile(String dirPath, File file, ZipOutputStream zouts) {
+		FileInputStream fin = null;
+		ZipEntry entry = null;
+		// 创建复制缓冲区
+		byte[] buf = new byte[4096];
+		int readByte = 0;
+		if (file.isFile()) {
+			try {
+				// 创建一个文件输入流
+				fin = new FileInputStream(file);
+				// 创建一个ZipEntry
+				entry = new ZipEntry(getEntryName(dirPath, file));
+				// 存储信息到压缩文件
+				zouts.putNextEntry(entry);
+				// 复制字节到压缩文件
+				while ((readByte = fin.read(buf)) != -1) {
+					zouts.write(buf, 0, readByte);
+				}
+				zouts.closeEntry();
+				fin.close();
+				System.out
+						.println("添加文件 " + file.getAbsolutePath() + " 到zip文件中!");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+
 	
 	/**
 	 * 修复路径，将 \\ 或 / 等替换为 File.separator

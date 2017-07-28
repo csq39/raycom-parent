@@ -21,7 +21,7 @@
 			#{type}, 
 			#{title}, 
 			#{createBy.id}, 
-			#{createDate,jdbcType=DATE}, 
+			#{createDate,jdbcType=TIMESTAMP}, 
 			#{remoteAddr}, 
 			#{userAgent}, 
 			#{requestUri}, 

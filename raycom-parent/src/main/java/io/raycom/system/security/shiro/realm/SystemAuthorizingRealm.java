@@ -123,8 +123,17 @@ public class SystemAuthorizingRealm extends AuthorizingRealm {
 			for (SystemRole role : user.getRoleList()){
 				if("admin".equals(role.getRoleType())){
 					user.setAdmin(true);
+					user.setSysData(true);
 				}
 				info.addRole(role.getEnname());
+			}
+			
+			List<SystemRole> roleList= user.getRoleList();
+			for (SystemRole systemRole : roleList) {
+				if("Y".equals(systemRole.getSysData())){
+					user.setSysData(true);
+					break;
+				}
 			}
 						
 			List<String> list = securityService.getPermissionByUserId();
