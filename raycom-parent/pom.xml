@@ -5,7 +5,7 @@
 	<parent>  
         <groupId>io.raycom</groupId>
   		<artifactId>raycom_parent_pom</artifactId>
-  		<version>1.0.0_20170726</version> 
+  		<version>1.0.0_20170802</version> 
         <relativePath>../raycom_parent_pom/pom.xml</relativePath>  
     </parent>
 
@@ -16,7 +16,7 @@
         <repository>
             <id>release</id>
             <name>cdc-plugin-respository</name>
-            <url>http://120.55.163.232:8888/repository/maven-releases/</url>
+            <url>http://139.196.191.0:8888/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
     
@@ -54,4 +54,5 @@
             </build>
         </profile>
 	</profiles>
+	
 </project>
