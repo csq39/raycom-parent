@@ -23,7 +23,7 @@ import freemarker.template.Template;
  */
 public class FreeMarkers {
 
-	public static String renderString(String templateString, Map<String, ?> model) {
+	public static String renderString(String templateString, Object model) {
 		try {
 			StringWriter result = new StringWriter();
 			Template t = new Template("name", new StringReader(templateString), new Configuration());

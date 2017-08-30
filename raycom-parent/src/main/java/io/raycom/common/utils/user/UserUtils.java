@@ -2,7 +2,7 @@
  * Copyright &copy; 2012-2014 <a href="https://github.com/csq/raycom">Raycom</a> All rights reserved.
  */
 package io.raycom.common.utils.user;
-
+	
 import io.raycom.common.bean.Principal;
 import io.raycom.common.bean.SystemUser;
 import io.raycom.common.config.Constant;
@@ -24,9 +24,14 @@ import org.apache.shiro.subject.Subject;
  */
 public class UserUtils {
 
-	private static UtilDao utilDao = SpringContextHolder.getBean(UtilDao.class);
+	private static UtilDao utilDao ;
 
-	
+	private static UtilDao getUtilDao(){
+		if (utilDao ==  null){
+			utilDao = SpringContextHolder.getBean(UtilDao.class);
+		}
+		return utilDao;
+	}
 	
 	/**
 	 * 根据ID获取用户
@@ -36,11 +41,11 @@ public class UserUtils {
 	public static SystemUser get(String id){
 		SystemUser user = (SystemUser)CacheUtils.get(Constant.USER_CACHE, Constant.USER_CACHE_ID_ + id);
 		if (user ==  null){
-			user = utilDao.getUser(id);
+			user = getUtilDao().getUser(id);
 			if (user == null){
 				return null;
 			}
-			user.setRoleList(utilDao.getRoleListByUserId(id));
+			user.setRoleList(getUtilDao().getRoleListByUserId(id));
 			CacheUtils.put(Constant.USER_CACHE, Constant.USER_CACHE_ID_ + user.getId(), user);
 			CacheUtils.put(Constant.USER_CACHE, Constant.USER_CACHE_LOGIN_NAME_ + user.getLoginName(), user);
 		}
@@ -55,11 +60,11 @@ public class UserUtils {
 	public static SystemUser getByLoginName(String loginName){
 		SystemUser user = (SystemUser)CacheUtils.get(Constant.USER_CACHE, Constant.USER_CACHE_LOGIN_NAME_ + loginName);
 		if (user == null){
-			user = utilDao.getByLoginName(loginName);
+			user = getUtilDao().getByLoginName(loginName);
 			if (user == null){
 				return null;
 			}
-			user.setRoleList(utilDao.getRoleListByUserId(user.getId()));
+			user.setRoleList(getUtilDao().getRoleListByUserId(user.getId()));
 			CacheUtils.put(Constant.USER_CACHE, Constant.USER_CACHE_ID_ + user.getId(), user);
 			CacheUtils.put(Constant.USER_CACHE, Constant.USER_CACHE_LOGIN_NAME_ + user.getLoginName(), user);
 		}
@@ -78,7 +83,7 @@ public class UserUtils {
 		
 		String officeName = (String)CacheUtils.get(Constant.USER_CACHE, Constant.USER_CACHE_OFFICE_ID_ + officeId);
 		if (officeName == null){
-			officeName = utilDao.getOfficeNameById(officeId);
+			officeName = getUtilDao().getOfficeNameById(officeId);
 			if (officeName == null){
 				return "";
 			}

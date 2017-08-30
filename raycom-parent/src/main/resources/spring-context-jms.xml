@@ -29,17 +29,5 @@
 		<!-- 这个connectionFactory对应的是我们定义的Spring提供的那个ConnectionFactory对象 -->
 		<property name="connectionFactory" ref="connectionFactory" />
 	</bean>
-	<!-- 
-
-	消息监听目的地
-	<bean id="departmentListener" class="com.digi.smartph.listener.DepartmentListener" />
-
-	消息监听容器
- 	<bean id="departmentContainer" 
- 		class="org.springframework.jms.listener.DefaultMessageListenerContainer"> 
- 		<property name="connectionFactory" ref="connectionFactory" /> 
- 		<property name="destination" ref="departmentDestination" /> 
- 		<property name="messageListener" ref="departmentListener" /> 
- 	</bean>
-	数据同步_end -->
+	
 </beans>

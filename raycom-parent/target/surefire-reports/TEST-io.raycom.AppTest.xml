@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="1" failures="0" name="io.raycom.AppTest" time="0.004" errors="0" skipped="0">
+<testsuite tests="1" failures="0" name="io.raycom.AppTest" time="0.01" errors="0" skipped="0">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk1.8.0_144\jre\bin"/>
@@ -27,7 +27,7 @@
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="user.variant" value=""/>
     <property name="os.name" value="Windows 10"/>
-    <property name="classworlds.conf" value="D:\eclipse\eclipse_open\workspace\.metadata\.plugins\org.eclipse.m2e.launching\launches\m2conf7679462570111358214.tmp"/>
+    <property name="classworlds.conf" value="D:\eclipse\eclipse_open\workspace\.metadata\.plugins\org.eclipse.m2e.launching\launches\m2conf2677740235177745054.tmp"/>
     <property name="sun.jnu.encoding" value="GBK"/>
     <property name="java.library.path" value="C:\Program Files\Java\jdk1.8.0_144\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:/Program Files/Java/jre1.8.0_144/bin/server;C:/Program Files/Java/jre1.8.0_144/bin;C:/Program Files/Java/jre1.8.0_144/lib/amd64;C:\ProgramData\Oracle\Java\javapath;D:\Python27\;D:\Python27\Scripts;D:\database\oracle\product\11.2.0\dbhome_1\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\WIDCOMM\Bluetooth Software\;C:\Program Files\WIDCOMM\Bluetooth Software\syswow64;C:\Program Files\jdk1.8.0_91\bin;D:\build\Git\cmd;D:\build\maven-3.3.9\bin;D:\Program Files\PuTTY\;D:\build\gradle-3.5.1\bin;C:\Program Files\TortoiseSVN\bin;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;D:\eclipse\eclipse_open;;."/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
@@ -61,5 +61,5 @@
     <property name="sun.desktop" value="windows"/>
     <property name="sun.cpu.isalist" value="amd64"/>
   </properties>
-  <testcase classname="io.raycom.AppTest" name="testApp" time="0.004"/>
+  <testcase classname="io.raycom.AppTest" name="testApp" time="0.01"/>
 </testsuite>

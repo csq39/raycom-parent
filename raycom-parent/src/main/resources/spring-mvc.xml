@@ -40,11 +40,6 @@
 				        <property name="streamDriver">
 				            <bean class="com.thoughtworks.xstream.io.xml.StaxDriver"/>
 				        </property>
-				       <!--  <property name="annotatedClasses">
-				            <list>
-				                <value>io.raycom.common.persistence.BaseEntity</value>
-				            </list>
-				        </property> -->
 				    </bean>
 		        </constructor-arg>
 		        <property name="supportedMediaTypes" value="application/xml"></property>
