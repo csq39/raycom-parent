@@ -55,7 +55,8 @@ public class SystemUser implements Serializable  {
 	private String companyId;	// 归属公司
 	private String officeId;	// 归属部门
 	
-
+	private RData userData;	// 扩展字段
+	
 	public SystemUser() {
 		super();
 		this.loginFlag = Global.YES;
@@ -323,5 +324,14 @@ public class SystemUser implements Serializable  {
 	public void setWhId(String whId) {
 		this.whId = whId;
 	}
+	
+	public RData getUserData() {
+		return userData;
+	}
+
+	public void setUserData(RData userData) {
+		this.userData = userData;
+	}
+
 	
 }
