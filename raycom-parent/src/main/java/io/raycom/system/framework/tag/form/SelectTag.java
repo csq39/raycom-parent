@@ -152,8 +152,17 @@ public class SelectTag extends CTag {
 			RData rdata = new RData();
 			rdata.set("code", code);
 			rdata.set("label", label);
-			
-			if(!StringUtils.isEmpty(value)&&value.contains(code)){//选中
+			boolean isSelected =false;
+			if(!StringUtils.isEmpty(value)) {
+				 String opts[]=value.split(",");
+				   for(int i=0;i<opts.length;i++){
+				       if(opts[i].equals(code)){
+				    	   isSelected =true;
+				    	   break;
+				       }
+				   }
+			 }
+			if(isSelected){//选中
 				sb.append(FreeMarkers.renderTemplate(selected, rdata));
 			}else{
 				sb.append(FreeMarkers.renderTemplate(temp, rdata));

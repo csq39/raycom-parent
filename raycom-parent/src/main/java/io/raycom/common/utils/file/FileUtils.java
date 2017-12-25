@@ -459,7 +459,8 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	public static byte[] zipFilesToByteArray(RData rdata) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ZipOutputStream zipOut = new ZipOutputStream(baos);
-		zipOut.setEncoding(System.getProperty("sun.jnu.encoding"));
+		//zipOut.setEncoding(System.getProperty("sun.jnu.encoding"));
+		zipOut.setEncoding("UTF-8");
 		List<RData> fileList  = (List<RData>)rdata.get("fileList");
 		for (RData file : fileList) {
 			String fileDir = file.getString("file");
@@ -488,6 +489,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	public static void zipDirectoryToZipFileByTag(String dirPath, ZipOutputStream zouts) {
 		ZipEntry entry = new ZipEntry(dirPath);
 		try {
+			entry.setUnixMode(755);//解决linux乱码
 			zouts.putNextEntry(entry);
 			zouts.closeEntry();
 		} catch (Exception e) {
@@ -514,18 +516,15 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 				fin = new FileInputStream(file);
 				// 创建一个ZipEntry
 				entry = new ZipEntry(dirPath);
-				System.out.println("添加文件 " + dirPath);
+				entry.setUnixMode(644);//解决linux乱码
 				// 存储信息到压缩文件
 				zouts.putNextEntry(entry);
 				// 复制字节到压缩文件
 				while ((readByte = fin.read(buf)) != -1) {
-					System.out.println("添加文件 " + readByte);
 					zouts.write(buf, 0, readByte);
 				}
 				zouts.closeEntry();
 				fin.close();
-				System.out
-						.println("添加文件 " + file.getAbsolutePath() + " 到zip文件中!");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

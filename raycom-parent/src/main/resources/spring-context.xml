@@ -15,7 +15,7 @@
 
 	<description>Spring Configuration</description>
     <!-- 加载配置属性文件 -->
-	<context:property-placeholder ignore-unresolvable="true" location="classpath:raycom.properties,classpath:raycom-scheduled.properties,classpath:raycom-task.properties,classpath:raycom-jms.properties" />
+	<context:property-placeholder ignore-unresolvable="true" ignore-resource-not-found="true" location="classpath:raycom.properties,classpath:raycom-scheduled.properties,classpath:raycom-task.properties,classpath:raycom-jms.properties" />
 	<!-- 加载应用属性实例，可通过  @Value("#{APP_PROP['jdbc.driver']}") String jdbcDriver 方式引用 -->
     <util:properties id="APP_PROP" location="classpath:raycom.properties" local-override="true"/>
 	

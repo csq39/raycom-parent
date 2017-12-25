@@ -59,13 +59,13 @@
 		SELECT tuw.wh_id "code",
 			   tuw.wh_id "whId",
 		       tuw.wh_name "name",
-		       SUBSTR(tuw.wh_parent_ids, 3, 6) "topPid",
+		       SUBSTR(tuw.wh_parent_ids, 8, 6) "topPid",
 		       tuw.wh_parent_id "pid",
 		       (select wh_name from tb_usc_warehouse where wh_id = tuw.wh_parent_id) "pName",
 		        decode((select wh_name from tb_usc_warehouse where wh_id = tuw.wh_parent_id),'大库','0','科室库','1',wh_parent_id) "index",
 		       (select wh_name
 		          from tb_usc_warehouse
-		         where wh_id = SUBSTR(tuw.wh_parent_ids, 3, 6)) "topPName"
+		         where wh_id = SUBSTR(tuw.wh_parent_ids, 8, 6)) "topPName"
 		  FROM tb_usc_warehouse tuw
 		 WHERE tuw.use_flag = 'Y'
 		   AND tuw.del_flag = 'N'

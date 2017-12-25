@@ -48,7 +48,7 @@ public class FileController extends BaseController{
 	@Value("${web.staticFile}")
 	private String validExt;// = "gif,jpg,jpeg,png,bmp,swf,flv,mp3,wav,wma,wmv,mid,avi,mpg,asf,rm,rmvb,doc,docx,xls,xlsx,ppt,htm,html,txt,zip,rar,gz,bz2";
 	
-    @RequestMapping(value = "${adminPath}/file/upload",method = RequestMethod.POST)  
+    @RequestMapping(value = "${adminPath}/file/upload")  
     @ResponseBody
 	public  RData upload(@RequestParam("file")  MultipartFile file ) {  
 		String originalFilename = file.getOriginalFilename();
